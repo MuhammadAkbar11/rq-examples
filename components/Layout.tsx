@@ -13,7 +13,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
-import { FaGithub, FaYoutube } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 type Props = {
   children?: ReactNode;
