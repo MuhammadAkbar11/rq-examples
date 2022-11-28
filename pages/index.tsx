@@ -12,8 +12,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import Layout from "@components/Layout";
+import { useQuery } from "react-query";
+import { getMarketService } from "@services/market.service";
 
 export default function Home() {
+  const { data: markets } = useQuery("markets", () => getMarketService(1));
+
+  console.log(markets);
+
   return (
     <Layout title="Crypto Market">
       <Table variant="simple">
