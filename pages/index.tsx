@@ -10,50 +10,96 @@ import {
   Tr,
   Image,
   Text,
+  Box,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import { useQuery } from "react-query";
 import { getMarketService } from "@services/market.service";
+import { Market } from "@utils/types/market";
+import { uFormatRupiah } from "@utils/index.utils";
+import Percentage from "@components/Percentage";
 
 export default function Home() {
-  const { data: markets } = useQuery("markets", () => getMarketService(1));
+  const {
+    data: markets,
+    isSuccess,
+    isError,
+    isLoading,
+    error,
+  } = useQuery<Market[]>("markets", () => getMarketService(1));
 
-  console.log(markets);
+  console.log(isError, error);
 
+  let no = 1;
   return (
     <Layout title="Crypto Market">
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Coin</Th>
-            <Th>Last Price</Th>
-            <Th>24h % Change</Th>
-            <Th isNumeric>Total Volume</Th>
-            <Th isNumeric>Market Cap</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>
-              <Flex alignItems="center">
-                <Image
-                  src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579"
-                  boxSize="24px"
-                  ignoreFallback={true}
-                />
+      <Box pb={16}>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>#</Th>
+              <Th>Coin</Th>
+              <Th>Last Price</Th>
+              <Th>24h % Change</Th>
+              <Th isNumeric>Total Volume</Th>
+              <Th isNumeric>Market Cap</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {isLoading ? (
+              <Tr>
+                <Td colSpan={6}>
+                  <Text align={"center"}>Loading...</Text>
+                </Td>
+              </Tr>
+            ) : null}
+            {isError ? (
+              <Tr>
+                <Td colSpan={6}>
+                  <Alert status="error" variant={"solid"}>
+                    <AlertIcon />
+                    <Text>There was an error processing your request</Text>
+                  </Alert>
+                </Td>
+              </Tr>
+            ) : null}
+            {isSuccess &&
+              markets?.map(m => {
+                return (
+                  <Tr>
+                    <Td width="10px">
+                      <Text pe={2}>{no++}</Text>
+                    </Td>
+                    <Td>
+                      <Flex alignItems="center">
+                        <Image
+                          src={m.image}
+                          boxSize="24px"
+                          ignoreFallback={true}
+                        />
 
-                <Text pl={2} fontWeight="bold" textTransform="capitalize">
-                  Bitcoin
-                </Text>
-                <Badge ml={3}>BTC</Badge>
-              </Flex>
-            </Td>
-            <Td>495460000</Td>
-            <Td>-5.11</Td>
-            <Td isNumeric>729292071672270</Td>
-            <Td isNumeric>9600947757539514</Td>
-          </Tr>
-          <Tr>
+                        <Text
+                          pl={2}
+                          fontWeight="bold"
+                          textTransform="capitalize"
+                        >
+                          {m.name}
+                        </Text>
+                        <Badge ml={3}>{m.symbol}</Badge>
+                      </Flex>
+                    </Td>
+                    <Td>{uFormatRupiah(m.current_price)}</Td>
+                    <Td>
+                      <Percentage percent={m.price_change_percentage_24h} />
+                    </Td>
+                    <Td isNumeric>{m.total_volume}</Td>
+                    <Td isNumeric>{m.market_cap}</Td>
+                  </Tr>
+                );
+              })}
+            {/* <Tr>
             <Td>
               <Flex alignItems="center">
                 <Image
@@ -72,9 +118,10 @@ export default function Home() {
             <Td>-1.45</Td>
             <Td isNumeric>539816863146117</Td>
             <Td isNumeric>2144364989936726</Td>
-          </Tr>
-        </Tbody>
-      </Table>
+          </Tr> */}
+          </Tbody>
+        </Table>
+      </Box>
     </Layout>
   );
 }

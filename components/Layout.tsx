@@ -48,13 +48,17 @@ const Layout = ({
         <Spacer />
         <ColorModeSwitcher />
       </Flex>
-
       {children}
       <Box
         position="fixed"
         bottom="0"
         left="0"
         zIndex="sticky"
+        bgColor={"white"}
+        _dark={{
+          bgColor: "gray.800",
+          borderColor: "gray.700",
+        }}
         borderTop="1px"
         borderColor="gray.200"
         py={2}
@@ -69,7 +73,15 @@ const Layout = ({
                   isExternal
                   mx={4}
                 >
-                  <Icon as={FaGithub} w={6} h={6} color="#24292e" />
+                  <Icon
+                    as={FaGithub}
+                    w={6}
+                    h={6}
+                    color="#24292e"
+                    _dark={{
+                      color: "gray.100",
+                    }}
+                  />
                 </Link>
               </Box>
             </Flex>
