@@ -13,6 +13,8 @@ import {
   Box,
   Alert,
   AlertIcon,
+  Grid,
+  Button,
 } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import { useQuery } from "react-query";
@@ -22,17 +24,30 @@ import { uFormatRupiah } from "@utils/index.utils";
 import Percentage from "@components/Percentage";
 
 export default function Home() {
+  let [startNum, setStartNum] = React.useState(1);
+  const [page, setPage] = React.useState(1);
+
   const {
     data: markets,
     isSuccess,
     isError,
     isLoading,
     error,
-  } = useQuery<Market[]>("markets", () => getMarketService(1));
+  } = useQuery<Market[]>(["markets", page], () => getMarketService(page), {
+    refetchInterval: 3000,
+    staleTime: 3000,
+    onSuccess: () => {
+      setStartNum((page - 1) * 10 + 1);
+    },
+  });
 
-  console.log(isError, error);
+  const nextPage = () => {
+    setPage(prevState => prevState + 1);
+  };
+  const previousPage = () => {
+    setPage(prevState => prevState - 1);
+  };
 
-  let no = 1;
   return (
     <Layout title="Crypto Market">
       <Box pb={16}>
@@ -70,7 +85,7 @@ export default function Home() {
                 return (
                   <Tr>
                     <Td width="10px">
-                      <Text pe={2}>{no++}</Text>
+                      <Text pe={2}>{startNum++}</Text>
                     </Td>
                     <Td>
                       <Flex alignItems="center">
@@ -121,6 +136,27 @@ export default function Home() {
           </Tr> */}
           </Tbody>
         </Table>
+        <Grid templateColumns="70% 1fr auto 1fr" gap={6} mt={10}>
+          <div></div>
+          <Button
+            colorScheme="facebook"
+            variant="outline"
+            size="sm"
+            onClick={previousPage}
+            disabled={page === 1 ? true : false}
+          >
+            Previous
+          </Button>
+          <Text>{page}</Text>
+          <Button
+            colorScheme="facebook"
+            variant="outline"
+            size="sm"
+            onClick={nextPage}
+          >
+            Next
+          </Button>
+        </Grid>
       </Box>
     </Layout>
   );
